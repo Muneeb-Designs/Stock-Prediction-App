@@ -16,6 +16,13 @@ import streamlit as st
 import base64
 import requests
 import time
+import warnings
+warnings.filterwarnings("ignore")
+
+import tensorflow as tf
+tf.compat.v1.logging.set_verbosity(tf.compat.v1.logging.ERROR)
+
+
 # ✅ Set page config FIRST
 st.set_page_config(page_title="Stock Price Forecast", layout="wide")
 
@@ -28,9 +35,11 @@ def get_base64_gif(gif_path):
 # ✅ Load the GIF
 gif_base64 = get_base64_gif("Flow.gif")  # Replace with your gif file name
 
+
 # ✅ Display as a short banner
 st.markdown(
     f"""
+
     <style>
     .gif-banner {{
         width: 100%;
@@ -103,6 +112,7 @@ def get_base64_logo(logo_path):
         data = f.read()
     return base64.b64encode(data).decode()
 
+
 # ✅ Load and display logo
 logo_base64 = get_base64_logo("logo.png")
 
@@ -156,8 +166,8 @@ with st.sidebar:
     st.markdown('<div class="sidebar-text">📬 Contact: <a href="mailto:muneeburrehman302302@proton.me">muneeburrehman302302@proton.me</a></div>', unsafe_allow_html=True)
 
 
-start = '2012-01-01'
-end = '2025-04-1'
+start = '2020-01-01'
+end = '2025-04-13'
 
 data = yf.download(selected_stock, start=start, end=end)
 
@@ -215,7 +225,8 @@ train_size = int(len(data) * 0.80)
 data_train = pd.DataFrame(data['Close'][:train_size])
 data_test = pd.DataFrame(data['Close'][train_size:])
 
-model_path = f'models/{selected_stock}_{model_choice}_Model.keras' if model_choice == "GRU" else f'models/{selected_stock}_{model_choice}_model.h5'
+model_path = f'models/{selected_stock}_{model_choice}_Model.keras' if model_choice == "GRU" else f'models/{selected_stock}_{model_choice}_Model.h5'
+
 scaler_path = f'models/{selected_stock}_{model_choice}_scaler.pkl'
 
 if os.path.exists(model_path) and os.path.exists(scaler_path):
