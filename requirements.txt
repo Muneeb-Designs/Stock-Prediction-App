@@ -1,0 +1,87 @@
+ **“AI-Driven Stock Price Prediction Using LSTM & GRU”**, the **requirements** can be categorized into three main parts:
+
+---
+
+### 🔧 **1. Technical Requirements**
+
+#### 📦 **Python Libraries / Dependencies**
+Here’s a list of packages based on your code:
+- `numpy` – numerical operations
+- `pandas` – data manipulation
+- `yfinance` – fetch stock market data
+- `matplotlib`, `seaborn` – data visualization
+- `tensorflow` – build and train LSTM & GRU models
+- `scikit-learn (sklearn)` – scaling and preprocessing
+- `joblib` / `pickle` – model serialization
+- `PIL` – image processing (for UI)
+- `streamlit` – interactive web app
+- `base64`, `requests`, `os`, `time`, `warnings`, `matplotlib.dates` – additional utilities
+
+#### 🧠 **Machine Learning Models**
+- **LSTM** (Long Short-Term Memory)
+- **GRU** (Gated Recurrent Units)
+
+#### ⚙️ **Tools**
+- **coolab** – for model development & testing
+- **Streamlit** – to deploy and run the web app
+- **VS code** – for managing environments (recommended)
+
+---
+
+### 💻 **System Requirements**
+- RAM: 8GB minimum (for training models)
+- GPU: Optional (faster training)
+- Disk: At least 1GB free space
+- OS: Windows/Linux/macOS
+
+---
+
+### 📁 **Project Structure (Example)**
+```
+StockPricePrediction/
+│
+├── app.py                           # Streamlit frontend
+├── Stock_Market_Prediction_Model_Creation.ipynb  # Model training notebook
+├── model/                           # Saved LSTM/GRU models (.h5 or .pkl)
+│   └── lstm_model.h5
+│   └── gru_model.h5
+├── data/                            # Historical stock data
+├── utils/                           # Utility functions (e.g., scaling, plotting)
+├── images/                          # Logos, plots, etc.
+├── requirements.txt                 # All dependencies listed
+└── README.md                        # Project overview
+```
+
+---
+
+### 📜 **requirements.txt (Sample)**
+```txt
+numpy
+pandas
+yfinance
+matplotlib
+seaborn
+tensorflow
+scikit-learn
+joblib
+streamlit
+Pillow
+requests
+```
+
+Generate this with:
+```bash
+pip freeze > requirements.txt
+```
+
+---
+
+### 🌐 **Functional Requirements**
+- Fetch real-time stock data
+- Visualize trends (e.g., moving average, RSI)
+- Predict next-day prices using trained LSTM/GRU
+- Interactive dashboard with user input (ticker, date range)
+- Plot actual vs predicted prices
+
+---
+
