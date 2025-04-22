@@ -166,8 +166,8 @@ with st.sidebar:
     st.markdown('<div class="sidebar-text">📬 Contact: <a href="mailto:muneeburrehman302302@proton.me">muneeburrehman302302@proton.me</a></div>', unsafe_allow_html=True)
 
 
-start = '2020-01-01'
-end = '2025-04-13'
+start = '2022-01-16'
+end = '2025-04-21'
 
 data = yf.download(selected_stock, start=start, end=end)
 
@@ -225,8 +225,7 @@ train_size = int(len(data) * 0.80)
 data_train = pd.DataFrame(data['Close'][:train_size])
 data_test = pd.DataFrame(data['Close'][train_size:])
 
-model_path = f'models/{selected_stock}_{model_choice}_Model.keras' if model_choice == "GRU" else f'models/{selected_stock}_{model_choice}_Model.h5'
-
+model_path = f'models/{selected_stock}_{model_choice}_Model.keras' if model_choice == "GRU" else f'models/{selected_stock}_{model_choice}_model.h5'
 scaler_path = f'models/{selected_stock}_{model_choice}_scaler.pkl'
 
 if os.path.exists(model_path) and os.path.exists(scaler_path):
@@ -294,68 +293,41 @@ plt.legend()
 st.pyplot(fig)
 
 
-# Function to calculate Rate of Change (ROC)
+
 def calculate_roc(data, period):
     return (data.pct_change(periods=period) * 100)
 
-# Function to calculate Weighted Moving Average (WMA)
+
 def calculate_wma(data, period):
     weights = np.arange(1, period + 1)
     return data.rolling(window=period).apply(lambda x: np.dot(x, weights) / weights.sum(), raw=True)
 
-# Function to calculate Coppock Curve (10, 14, 11)
 def calculate_coppock_curve(data):
-    # Calculate ROC(10) and ROC(14)
     roc_10 = calculate_roc(data, 10)
     roc_14 = calculate_roc(data, 14)
-    
-    # Combine ROC(10) and ROC(14)
     combined_roc = roc_10 + roc_14
-    
-    # Calculate WMA(11) of combined ROC
     coppock_curve = calculate_wma(combined_roc, 11)
-    
     return coppock_curve
 
-# Calculate Coppock Curve for the 'Close' price column
 data['Coppock Curve'] = calculate_coppock_curve(data['Close'])
 
-# Plot the Coppock Curve
 st.subheader(f"📉 Coppock Curve for {selected_stock} (Line Graph)")
 
-# Create the plot
 fig, ax = plt.subplots(figsize=(10, 6))
-
-# Plot the Coppock Curve line
 ax.plot(data.index, data['Coppock Curve'], label='Coppock Curve (10, 14, 11)', color='blue', lw=2)
-
-# Add a horizontal line at 0 to indicate the baseline
 ax.axhline(0, color='red', linestyle='--', label='Zero Line')
 
-# Highlight Buy signals (when Coppock Curve crosses above 0)
 buy_signals = data[data['Coppock Curve'] > 0]
 ax.plot(buy_signals.index, buy_signals['Coppock Curve'], 'go', label='Buy Signal', markersize=5)
-
-# Add labels, title, and legend
 ax.set_title(f'Coppock Curve for {selected_stock}')
 ax.set_xlabel('Date')
 ax.set_ylabel('Coppock Curve Value')
 ax.legend(loc='best')
 ax.grid(True)
-
-# Display plot in Streamlit
 st.pyplot(fig)
 
+df = yf.download(selected_stock, period="3mo", interval="1d")
 
-
-
-# Assume you already have this somewhere:
-# selected_stock = st.selectbox("Choose Stock", ["AAPL", "TSLA", "GOOGL", "MSFT", ...])
-
-# Download data using selected stock
-df = yf.download(selected_stock, period="6mo", interval="1d")
-
-# Compute ADL
 def compute_adl(df):
     mfm = ((df['Close'] - df['Low']) - (df['High'] - df['Close'])) / (df['High'] - df['Low'])
     mfm = mfm.replace([np.inf, -np.inf], 0).fillna(0)
@@ -383,7 +355,7 @@ st.pyplot(fig)
 
 # RSI Calculation
 def compute_rsi(data, window=14):
-    data = data.tail(100)  # Compute RSI only for the last 100 days
+    data = data.tail(100) 
     delta = data['Close'].diff(1)
     gain = (delta.where(delta > 0, 0)).rolling(window=window).mean()
     loss = (-delta.where(delta < 0, 0)).rolling(window=window).mean()
@@ -391,34 +363,25 @@ def compute_rsi(data, window=14):
     rsi = 100 - (100 / (1 + rs))
     return rsi
 
-# Compute and plot RSI
 import matplotlib.dates as mdates
 
 st.subheader('Relative Strength Index (RSI)')
 
-# Compute RSI
 data['RSI'] = compute_rsi(data)
 
-# Create plot
 fig, ax = plt.subplots(figsize=(10, 6))
 sns.lineplot(x=data.index, y=data['RSI'], label='RSI', color='purple', ax=ax)
 
-# Add overbought and oversold lines
 ax.axhline(70, linestyle='--', color='red', label='Overbought')
 ax.axhline(30, linestyle='--', color='green', label='Oversold')
 
-# Format x-axis for better readability
-ax.xaxis.set_major_locator(mdates.AutoDateLocator())  # Adjusts date spacing
+ax.xaxis.set_major_locator(mdates.AutoDateLocator())  
 ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m-%d'))  # Format dates
-plt.xticks(rotation=45)  # Rotate x-axis labels for clarity
-
+plt.xticks(rotation=45) 
 ax.set_title('Relative Strength Index (RSI)')
 ax.legend()
-
-# Display plot in Streamlit
 st.pyplot(fig)
 
-# Actual vs Predicted
 st.subheader("🔁 Original vs Predicted Price")
 fig4 = plt.figure(figsize=(10, 4))
 plt.plot(predictions, 'r', label='Predicted Price')
@@ -444,10 +407,43 @@ last_lookback = data_test_scaled[-100:]
 future_prices = predict_future(model, last_lookback, scaler, days=3)
 st.success(f"📅 Predicted Prices: {future_prices}")
 
+cnbc_video = """
+<iframe width="100%" height="315" src="https://www.youtube.com/embed/gbDUCnuLAU0"
+title="CNBC TV18 Editors' Roundtable" frameborder="0"
+allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+allowfullscreen></iframe>
+"""
 
-# Footer
+st.markdown("### 📺 CNBC TV18 – Editors' Roundtable")
+st.markdown(cnbc_video, unsafe_allow_html=True)
+
 st.markdown("""
     <div class="custom-footer">
         Developed by Muneeb Ur Rehman | Powered by TensorFlow & Streamlit
     </div>
 """, unsafe_allow_html=True)
+
+import streamlit as st
+import base64
+def get_base64_of_image(image_path):
+    with open(image_path, "rb") as img_file:
+        base64_img = base64.b64encode(img_file.read()).decode()
+    return base64_img
+
+image_path = "bg.jpg"
+base64_image = get_base64_of_image(image_path)
+
+# Inject custom CSS with base64 image
+page_bg_img = f"""
+<style>
+[data-testid="stAppViewContainer"] {{
+    background-image: url("data:image/jpeg;base64,{base64_image}");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}}
+</style>
+"""
+
+st.markdown(page_bg_img, unsafe_allow_html=True)
+
